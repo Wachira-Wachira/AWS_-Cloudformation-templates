@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  This template creates two DynamoDB tables. The purpose if this template is to test the functionality
+  of the import feature of CloudFormation. Once the stack is created, I will import Table2 to another template.
+Resources: 
+  UserDetails: 
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: 'User-Details'
+      AttributeDefinitions: 
+        - 
+         AttributeName: "Machine_SerialNo"
+         AttributeType: "S" 
+        - 
+         AttributeName: "Employee_Id"
+         AttributeType: "S"      
+        - 
+         AttributeName: "Organization"
+         AttributeType: "S" 
+        - 
+         AttributeName: "Name"
+         AttributeType: "S"     
+      KeySchema: 
+        - 
+         AttributeName: "Machine_SerialNo"
+         KeyType: "HASH" #partition key
+        - 
+         AttributeName: "Employee_Id"
+         KeyType: "RANGE" #sort key
+      ProvisionedThroughput: 
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+
+      GlobalSecondaryIndexes: 
+        - 
+          IndexName: "GSI"
+          KeySchema: 
+            - 
+              AttributeName: "Organization"
+              KeyType: "HASH"
+            - 
+              AttributeName: "Employee_Id"
+              KeyType: "RANGE"
+          Projection: 
+            NonKeyAttributes: 
+              - "Name"
+            ProjectionType: "INCLUDE"
+          ProvisionedThroughput: 
+            ReadCapacityUnits: "5"
+            WriteCapacityUnits: "5"
+
+      LocalSecondaryIndexes: 
+        - 
+          IndexName: "LSI"
+          KeySchema: 
+            - 
+              AttributeName: "Machine_SerialNo"
+              KeyType: "HASH"
+            - 
+              AttributeName: "Name"
+              KeyType: "RANGE"
+          Projection: 
+            NonKeyAttributes: 
+              - "Employee_Id"
+            ProjectionType: "INCLUDE"
+      
+  MachineDetails:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: 'Device-Details'
+      AttributeDefinitions: 
+        - 
+         AttributeName: "Serial_No"
+         AttributeType: "S"    
+       # - 
+#        AttributeName: "Vendor"
+       #  AttributeType: "S"   
+       # - 
+       #  AttributeName: "Device_Name"
+       #  AttributeType: "S"
+      
+      KeySchema: 
+        - 
+         AttributeName: "Serial_No"
+         KeyType: "HASH" #partition key
+       # -
+       #  AttributeName: "Vendor"
+       #  KeyType: "RANGE" #sort key
+        
+      ProvisionedThroughput: 
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
